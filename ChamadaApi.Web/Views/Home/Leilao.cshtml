@@ -1,0 +1,18 @@
+﻿@model ChamadaApi.Domain.Leilao;
+
+@{
+    ViewData["Title"] = "Leilão";
+}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <form action="AlterarLeilao" method="post">
+                <input class="form-control" name="Codigo" id="codigo" type="text" value="@Model.Codigo" />
+                <input class="form-control" name="Data" id="data" type="date" value="@Model.Data" />
+                <input class="form-control" name="Descricao" id="descricao" type="text" value="@Model.Descricao" />
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </form>
+        </div>
+    </div>
+</div>
+

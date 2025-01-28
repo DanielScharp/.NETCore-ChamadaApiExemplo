@@ -1,0 +1,135 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link href="/stylesheets/login.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+</head>
+
+<body class="text-center">
+    <form class="form-signin">
+        <h1 class="h3 mb-3 font-weight-normal">Acessar painel</h1>
+        <input type="text" id="apelido" name="apelido" class="form-control" placeholder="Login" required autofocus>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Senha" required>
+
+        <div class="g-recaptcha" data-sitekey="6LcR8AgUAAAAALp_zyIF1E8rJV4sp2JtRTLVUxRo"></div>
+
+        <button class="btn btn-lg btn-primary btn-block mt-2" type="button" id="loginForm">Acessar</button>
+
+        <div class="mt-2" id="dvResultLogin">
+        </div>
+    </form>
+</body>
+</html>
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<script src="/js/crypto.js"></script>
+<script>
+    $(function () {
+
+        $("#loginForm").click(function () {
+            efetuarLogin();
+        });
+        $(document).keypress(function(e) {
+        if (e.which == 13) { // 13 é o código da tecla Enter
+            efetuarLogin();
+        }
+    });
+
+
+    });
+    //Login
+    var efetuarLogin = function () {
+        var apelido = $("#apelido").val();
+        var password = $("#password").val();
+
+        //*-----------------*/
+        if (apelido == undefined || apelido == '') {
+
+            $("#dvResultLogin").html("<div class='alert alert-sm alert-danger'>O campo [Login] é obrigatório.</div>");
+            $("#dvResultLogin").removeClass("hidden");
+
+            return;
+        }
+
+        if (password == undefined || password == '') {
+            $("#dvResultLogin").html("<div class='alert alert-sm alert-danger'>O campo [Senha] é obrigatório.</div>");
+            $("#dvResultLogin").removeClass("hidden");
+            return;
+        }
+
+        //Recaptha
+        //var validado = $("#g-recaptcha-response").val();
+        var validado = "x";
+
+
+        if (validado == "") {
+            $("#dvResultLogin").html("<div class='alert alert-sm alert-danger'>Necessário validar o formulário antes de enviar.</div>");
+            return false;
+        }
+        //*-----------------*/
+
+        const key = CryptoJS.enc.Utf8.parse("ydvMmMc3I7HOje3i");
+        const iv = CryptoJS.enc.Utf8.parse("wp4zjuwGZwh593An");
+
+        //Encripta
+        var encPass = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(password), key,
+            {
+                keySize: 128 / 8,
+                iv: iv,
+                mode: CryptoJS.mode.CBC,
+                padding: CryptoJS.pad.Pkcs7
+            });
+
+        //Convert em string para passar na URL
+        var encPassString = window.btoa ? window.btoa(encPass) : Base64.encode(encPass + "");
+
+        var login = {
+            Apelido: apelido,
+            password: encPassString,
+            ipOrigem: "",
+            appOrigem: ""
+        }
+
+        $("#loginForm").prop("disabled", true);
+
+        $.ajax({
+            url: "/Login/In",
+            async: true,
+            type: "POST",
+            data: login
+        }).done(function (data) {
+
+            $("#loginForm").prop("disabled", false);
+
+            if (parseInt(data) == 1) {
+                self.location = '/';
+            }
+            else {
+                $("#dvResultLogin").html("<div class='alert alert-sm alert-danger'>" + data + "</div>");
+                $("#dvResultLogin").removeClass("hidden");
+
+            }
+
+        }).fail(function (jqXHR, textStatus) {
+
+            $("#loginForm").prop("disabled", false);
+            $("#dvResultLogin").html("<div class='alert alert-sm alert-danger'>Ocorreu um erro ao tentar executar a operação. Tente mais tarde!</div>");
+        });
+    }
+</script>
