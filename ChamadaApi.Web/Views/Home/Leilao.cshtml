@@ -4,15 +4,26 @@
     ViewData["Title"] = "Leilão";
 }
 <div class="container">
-    <div class="row">
-        <div class="col-12">
-            <form action="AlterarLeilao" method="post">
-                <input class="form-control" name="Codigo" id="codigo" type="text" value="@Model.Codigo" />
-                <input class="form-control" name="Data" id="data" type="date" value="@Model.Data" />
-                <input class="form-control" name="Descricao" id="descricao" type="text" value="@Model.Descricao" />
-                <button type="submit" class="btn btn-primary">Salvar</button>
-            </form>
+    <form action="AlterarLeilao" method="post">
+        <div class="row">
+            <div class="col-4">
+                <input class="form-control col-6" name="Codigo" id="codigo" type="text" value="@Model.Codigo" />
+                
+            </div>
+            <div class="col-4">
+                <input class="form-control col-6" name="Data" id="data" type="date" value="@Model.Data" />
+            </div>
+            <div class="col-4">
+                <input class="form-control col-6" name="Descricao" id="descricao" type="text" value="@Model.Descricao" />
+            </div>
+
         </div>
-    </div>
+        <div class="row mt-2">
+            <div class="col-12 d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Salvar</button>
+
+            </div>
+        </div>
+    </form>
 </div>
 
