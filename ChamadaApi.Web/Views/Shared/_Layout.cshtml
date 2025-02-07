@@ -3,10 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - ChamadaApi.Web</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <link href="~/css/bootstrap.css" rel="stylesheet" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ChamadaApi.Web.styles.css" asp-append-version="true" />
+
 </head>
 <body>
     <header>
@@ -41,9 +43,160 @@
             &copy; 2024 - ChamadaApi.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/jquery-3.6.0.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap.js" asp-append-version="true"></script>
+    <script src="~/js/jquery.mask-min.js" asp-append-version="true"></script>
+
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <div class="modal" id="modalJsAlert" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">Atenção!</h5>
+
+                </div>
+                <div class="modal-body">
+                    <label><span id="modalJsAlertInfo">?</span></label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="modalJsAlertOk" data-dismiss="modal" class="btn btn-outline-secondary">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalJsConfirm" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">Confirmação</h5>
+
+                </div>
+                <div class="modal-body">
+                    <label><span id="modalJsConfirmQuestion">Deseja realmente executar esta operação?</span></label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="modalJsConfirmYes" data-dismiss="modal" class="btn btn-outline-success">Sim</button>
+                    <button type="button" id="modalJsConfirmNo" data-dismiss="modal" class="btn btn-outline-danger">Não</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalJsPrompt" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="">
+                        Prompt
+                    </h5>
+
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label><span id="modalJsPromptQuestion">?</span></label>
+                        <input class="form-control" id="modalJsPromptValor" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="modalJsPromptOk" data-dismiss="modal" class="btn btn-outline-secondary">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        var JsAlert = function (info, callback) {
+            // Exibe o modal
+            $('#modalJsAlert').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true
+            });
+
+            // Atualiza o texto do modal
+            $("#modalJsAlertInfo").html(info);
+
+            // Remove o evento de clique anterior para evitar múltiplas associações
+            $('#modalJsAlertOk').off('click').on('click', function () {
+                // Fecha o modal
+                $('#modalJsAlert').modal('hide');
+
+                // Executa o callback, se definido
+                if (callback) {
+                    callback();
+                }
+            });
+        };
+
+
+        //Model genérico para confirmar operações
+        var JsConfirm = function (callback, optionalLabel) {
+
+            $('#modalJsConfirm').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true
+            });
+
+            if (optionalLabel != null) {
+                $("#modalJsConfirmQuestion").html(optionalLabel);
+            }
+
+            //Modal de confirmação
+            $('#modalJsConfirmYes').click(function () {
+                if (callback) callback(true);
+                //Remove o evento dos botões
+                $('#modalJsConfirmNo').off('click');
+                $('#modalJsConfirmYes').off('click');
+                $('#modalJsConfirm').modal('hide');
+
+            });
+
+            $('#modalJsConfirmNo').click(function () {
+                if (callback) callback(false);
+                //Remove o evento dos botões
+                $('#modalJsConfirmNo').off('click');
+                $('#modalJsConfirmYes').off('click');
+                $('#modalJsConfirm').modal('hide');
+            });
+        };
+
+        //Model genérico para confirmar operações
+        var JsPrompt = function (question, callback) {
+
+            $('#modalJsPrompt').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show: true
+            });
+
+            $("#modalJsPromptQuestion").html(question);
+            $('#modalJsPromptValor').val("");
+            $('#modalJsPromptValor').focus();
+
+            //Modal de confirmação
+            $('#modalJsPromptOk').click(function () {
+                if (callback) callback($('#modalJsPromptValor').val());
+                //Remove o evento dos botões
+                $('#modalJsPromptOk').off('click');
+                $('#modalJsPrompt').modal('hide');
+
+            });
+        };
+
+        //Confirma o modal ao enviar um Enter
+        $("#modalJsPromptValor").on("keydown", function (e) {
+            if (e.which == 13) {
+                $('#modalJsPromptOk').click();
+            }
+        });
+
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

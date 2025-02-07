@@ -1,25 +1,35 @@
 ﻿@model ErrorViewModel
 @{
+    Layout = null;
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<!DOCTYPE html>
+<html lang="en">
 
-@if (Model.ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
-}
+<head>
+    <title>@Model.Title</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+<body>
+    <div class="container py-3">
+        <div class="p-3 bg-white mb-4" style="height: 80vh; display: flex; justify-content: center;">
+            <div style="display: flex; justify-content: center; align-items: center; flex-direction:column; position: relative; top: -40px;">
+                @if(Model != null)
+                {
+                    <p style="color:#336076; font-size: 32px; font-weight: 500; margin: 0;text-align: center;">@Model.Title</p>
+                    <p style="text-align: center">@Html.Raw(Model.Message)</p>
+                }
+                else
+                {
+                    <p style="color:#336076; font-size: 32px; font-weight: 500; margin: 0;">Oops!</p>
+                    <p style="text-align: center">Ocorreu um erro durante o processamento da sua solicitação.</p>
+                }
+
+                <a href="/home" style="color: #fff; background: #3d8fb2; padding: 7px 20px; border-radius: 3px;">Ir para a Home page</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -17,7 +17,7 @@ namespace ChamadaApi.Database.MySql
         {
             _connMySql = connMySql;
         }
-        public async Task<Leilao> GetLeilaoAsync(int id)
+        public async Task<Leilao> GetAuctionAsync(int id)
         {
 
             using var connection = new MySqlConnection(_connMySql);
@@ -57,7 +57,7 @@ namespace ChamadaApi.Database.MySql
                     connection.Close();
             }
         }
-        public async Task<List<Leilao>> GetLeiloesAsync()
+        public async Task<List<Leilao>> GetAuctionsAsync()
         {
 
             using var connection = new MySqlConnection(_connMySql);
@@ -67,7 +67,7 @@ namespace ChamadaApi.Database.MySql
                 await connection.OpenAsync();
 
                 var query = new StringBuilder();
-                query.Append(" SELECT codigo, data, descricao FROM leilao.leiloes limit 2; ");
+                query.Append(" SELECT codigo, data, descricao FROM leilao.leiloes limit 10; ");
 
                 using MySqlCommand command = new(query.ToString(), connection);
 
@@ -99,7 +99,7 @@ namespace ChamadaApi.Database.MySql
             }
         }
 
-        public async Task<Leilao> AlterDescricaoLeilaoAsync(Leilao leilao)
+        public async Task<Leilao> AlterAuctionAsync(Leilao leilao)
         {
 
             using var connection = new MySqlConnection(_connMySql);
@@ -109,7 +109,10 @@ namespace ChamadaApi.Database.MySql
                 await connection.OpenAsync();
 
                 var query = new StringBuilder();
-                query.AppendFormat(" UPDATE leiloes set descricao = '{0}' where codigo = '{1}' ", leilao.Descricao, leilao.Codigo);
+                query.Append(" UPDATE leiloes set ");
+                query.AppendFormat(" descricao = '{0}', ", leilao.Descricao);
+                query.AppendFormat(" data = '{0}' ", leilao.Data.DateMySql());
+                query.AppendFormat(" where ( codigo = '{0}' ) ", leilao.Codigo);
 
                 using MySqlCommand command = new(query.ToString(), connection);
 
@@ -128,7 +131,7 @@ namespace ChamadaApi.Database.MySql
             }
         }
 
-        public async Task<Leilao> InsertLeilaoAsync(Leilao leilao)
+        public async Task<Leilao> InsertAuctionAsync(Leilao leilao)
         {
 
             using var connection = new MySqlConnection(_connMySql);
@@ -143,6 +146,7 @@ namespace ChamadaApi.Database.MySql
                 using MySqlCommand command = new(query.ToString(), connection);
 
                 await command.ExecuteReaderAsync();
+                leilao.Codigo = (int)command.LastInsertedId;
 
                 return leilao;
             }
@@ -156,5 +160,35 @@ namespace ChamadaApi.Database.MySql
                     connection.Close();
             }
         }
+
+        public async Task<bool> DeleteAuctionAsync(int id)
+        {
+            using var connection = new MySqlConnection(_connMySql);
+
+            try
+            {
+                await connection.OpenAsync();
+
+                var query = new StringBuilder();
+
+                query.AppendFormat("  ", id);
+
+                using MySqlCommand command = new(query.ToString(), connection);
+
+                int rowsAffected = await command.ExecuteNonQueryAsync();
+
+                return rowsAffected > 0; // Retorna true se pelo menos uma linha foi afetada
+            }
+            catch
+            {
+                throw;
+            }
+            finally
+            {
+                if(connection.State == ConnectionState.Open)
+                    await connection.CloseAsync();
+            }
+        }
+
     }
 }

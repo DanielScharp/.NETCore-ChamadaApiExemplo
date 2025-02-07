@@ -19,22 +19,22 @@ namespace ChamadaApi.Application
             _leiloesRepository = leiloesRepository;
         }
 
-        public async Task<Leilao> GetLeilaoAsync(int id)
+        public async Task<Leilao> GetAuctionAsync(int id)
         {
             try
             {
-                return await _leiloesRepository.GetLeilaoAsync(id);
+                return await _leiloesRepository.GetAuctionAsync(id);
             }
             catch
             {
                 throw;
             }
         }
-        public async Task<List<Leilao>> GetLeiloesAsync()
+        public async Task<List<Leilao>> GetAuctionsAsync()
         {
             try
             {
-                return await _leiloesRepository.GetLeiloesAsync();
+                return await _leiloesRepository.GetAuctionsAsync();
             }
             catch
             {
@@ -42,11 +42,11 @@ namespace ChamadaApi.Application
             }
         }
 
-        public async Task<Leilao> AlterDescricaoLeilaoAsync(Leilao leilao)
+        public async Task<Leilao> AlterAuctionAsync(Leilao leilao)
         {
             try
             {
-                return await _leiloesRepository.AlterDescricaoLeilaoAsync(leilao);
+                return await _leiloesRepository.AlterAuctionAsync(leilao);
             }
             catch
             {
@@ -54,12 +54,23 @@ namespace ChamadaApi.Application
             }
         }
         
-
-        public async Task<Leilao> InsertLeilaoAsync(Leilao leilao)
+        public async Task<Leilao> InsertAuctionAsync(Leilao leilao)
         {
             try
             {
-                return await _leiloesRepository.InsertLeilaoAsync(leilao);
+                return await _leiloesRepository.InsertAuctionAsync(leilao);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> DeleteAuctionAsync(int id)
+        {
+            try
+            {
+                return await _leiloesRepository.DeleteAuctionAsync(id);
             }
             catch
             {

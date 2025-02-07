@@ -4,26 +4,51 @@
     ViewData["Title"] = "Leilão";
 }
 <div class="container">
-    <form action="AlterarLeilao" method="post">
+    <form>
         <div class="row">
             <div class="col-4">
-                <input class="form-control col-6" name="Codigo" id="codigo" type="text" value="@Model.Codigo" />
-                
+                <input class="form-control col-12" name="Codigo" id="codigo" type="text" value="@Model.Codigo" disabled />
             </div>
             <div class="col-4">
-                <input class="form-control col-6" name="Data" id="data" type="date" value="@Model.Data" />
+                <input class="form-control col-12" name="Data" id="data" type="date" value="@Model.Data.ToString("yyyy-MM-dd")" />
             </div>
             <div class="col-4">
-                <input class="form-control col-6" name="Descricao" id="descricao" type="text" value="@Model.Descricao" />
+                <input class="form-control col-12" name="Descricao" id="descricao" type="text" value="@Model.Descricao" />
             </div>
-
         </div>
         <div class="row mt-2">
-            <div class="col-12 d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary">Salvar</button>
-
+            <div class="col-12 d-flex justify-content-center" style="gap: 1rem;">
+                <a href="/Home/RetornarLeilao" class="btn btn-sm btn-primary">Novo</a>
+                <button type="button" onclick="alterarLeilao()" class="btn btn-sm btn-primary">Salvar</button>
             </div>
         </div>
     </form>
 </div>
+<script>
+    var alterarLeilao = function () {
+        var leilao = {
+            Codigo: $("#codigo").val(),
+            Data: $("#data").val(),
+            Descricao: $("#descricao").val(),
+        }
 
+        $.ajax({
+            url: "/Home/InserirAlterarLeilao",
+            async: true,
+            type: "POST",
+            data: leilao,
+            success: function (data) {
+                if (data.success) {
+                    JsAlert(data.message, function () {
+                        window.location.href = "/home/RetornarLeilao?codigo=" + data.data.codigo;
+                    });
+                } else {
+                    JsAlert(data.message);
+                }
+            },
+            error: function () {
+                JsAlert("Erro inesperado ao tentar alterar o leilão.");
+            }
+        });
+    };
+</script>

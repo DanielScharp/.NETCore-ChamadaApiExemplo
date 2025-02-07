@@ -5,7 +5,7 @@
 }
 
 <h1>Index</h1>
-
+<a href="/home/RetornarLeilao">Cadastrar leilão</a>
 <table class="table">
     <thead>
         <tr>
@@ -18,13 +18,16 @@
             <th>
                 Descrição
             </th>
+            <th>
+
+            </th>
         </tr>
     </thead>
     <tbody>
     @foreach (var item in Model) {
         <tr>
             <td>
-                <a href="/Home/Leilao?codigo=@item.Codigo">
+                    <a href="/Home/RetornarLeilao?codigo=@item.Codigo">
                     @item.Codigo
                 </a>
             </td>
@@ -34,7 +37,35 @@
             <td>
                 @item.Descricao
             </td>
+            <td>
+                <button class="btnExcluir" onclick="excluirLeilao(@item.Codigo)">
+                    Excluir
+                </button>
+            </td>
         </tr>
     }
     </tbody>
 </table>
+
+<script>
+    var excluirLeilao = function (id) {
+        $.ajax({
+            url: "/Home/ExcluirLeilao?codigo=" + id,
+            async: true,
+            type: "DELETE",
+            success: function (data) {
+                if (data.success) {
+                    JsAlert(data.message, function () {
+                        location.reload();
+                    });
+                } else {
+                    JsAlert(data.message);
+                }
+            },
+            error: function () {
+                JsAlert("Erro inesperado ao tentar excluir o leilão.");
+            }
+        });
+    };
+
+</script>

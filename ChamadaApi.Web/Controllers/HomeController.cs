@@ -25,9 +25,10 @@ namespace ChamadaApi.Web.Controllers
                 var request = new ApiRequest
                 {
                     Route = "/Leiloes/Listar",
-                    Method = HttpMethod.Get, 
-                    QueryParams = new { categoriaId = 1, valor = 2.5, vdd = true },
+                    Method = HttpMethod.Get,
                     Body = new Leilao { Codigo = 123, Data = DateTime.Now, Descricao = "Leilão de carros" }
+                    //QueryParams = new { categoriaId = 1, valor = 2.5, vdd = true }, Exemplo um ou mais parametros
+                    //Body = new Leilao { Codigo = 123, Data = DateTime.Now, Descricao = "Leilão de carros" } Exemplo de uma class
                 };
 
                 var result = await _apiService.ExecuteRequestAsync(request);
@@ -47,7 +48,7 @@ namespace ChamadaApi.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Leilao(int codigo)
+        public async Task<IActionResult> RetornarLeilao(int codigo)
         {
             try
             {
@@ -67,7 +68,7 @@ namespace ChamadaApi.Web.Controllers
                     leilao = JsonConvert.DeserializeObject<Leilao>(result.Data.ToString());
                 }
 
-                return View(leilao);
+                return View("Leilao", leilao);
             }
             catch
             {
@@ -76,16 +77,24 @@ namespace ChamadaApi.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AlterarLeilao(Leilao leilao)
+        public async Task<IActionResult> InserirAlterarLeilao(Leilao leilao)
         {
             try
             {
-                var request = new ApiRequest
+                var request = new ApiRequest();
+
+                if(leilao.Codigo == 0)
                 {
-                    Route = "/Leiloes/Alterar-descricao",
-                    Method = HttpMethod.Put,
-                    Body = new Leilao { Codigo = leilao.Codigo, Descricao = leilao.Descricao },
-                };
+                    request.Route = "/Leiloes/Inserir";
+                    request.Method = HttpMethod.Post;
+                } 
+                else
+                {
+                    request.Route = "/Leiloes/Alterar";
+                    request.Method = HttpMethod.Put;
+                }
+
+                request.Body = leilao;
 
                 var result = await _apiService.ExecuteRequestAsync(request);
 
@@ -94,14 +103,87 @@ namespace ChamadaApi.Web.Controllers
                     leilao = JsonConvert.DeserializeObject<Leilao>(result.Data.ToString());
                 }
 
-                // Retorne algum resultado após a operação
-                return RedirectToAction("Leilao", leilao);
+                return Json(
+                    new ApiResponse
+                    {
+                        Success = result.Success,
+                        Message = result.Message,
+                        Data = leilao
+                    }
+                );
             }
             catch(Exception ex)
             {
-                // Log a exceção e retorne uma resposta adequada
-                return StatusCode(500, $"Erro: {ex.Message}");
+                return Json(
+                    new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Erro ao alterar o leilão. Tente novamente mais tarde.",
+                        Data = ex.Data
+                    }
+                );
             }
         }
+
+        [HttpDelete]
+        public async Task<IActionResult> ExcluirLeilao(int codigo)
+        {
+            try
+            {
+                var request = new ApiRequest
+                {
+                    Route = "/Leiloes/Excluir",
+                    Method = HttpMethod.Delete,
+                    QueryParams = new { id = codigo },
+                };
+
+                var result = await _apiService.ExecuteRequestAsync(request);
+
+                return Json(result);
+            }
+            catch(Exception ex)
+            {
+                return Json(
+                    new ApiResponse { 
+                        Success = false, 
+                        Message = "Erro ao excluir o leilão. Tente novamente mais tarde.",
+                        Data = ex.Data
+                    }
+                );
+            }
+        }
+
+        public IActionResult Error(int id = 0, string? message = null)
+        {
+            var modelError = new ErrorViewModel
+            {
+                ErrorCode = id,
+                Message = message ?? "Houve um erro ao processar a rotina! Tente novamente mais tarde ou contate nosso suporte.",
+                Title = "Algo deu errado!"
+            };
+
+            switch(id)
+            {
+                case 500:
+                    modelError.Title = "Ocorreu um erro!";
+                    modelError.Message = message ?? "Ocorreu um erro! Tente novamente mais tarde ou contate nosso suporte.";
+                break;
+                case 400:
+                    modelError.Title = "Algo deu errado!";
+                    modelError.Message = message ?? "Houve um erro ao processar a rotina! Tente novamente mais tarde ou contate nosso suporte.";
+                break;
+                case 404:
+                    modelError.Title = "Ops! Página não encontrada.";
+                    modelError.Message = message ?? "A página que está procurando não existe! <br/>Em caso de dúvidas entre em contato com nosso suporte.";
+                break;
+                case 503:
+                    modelError.Title = "Serviço Indisponível";
+                    modelError.Message = message ?? "O serviço solicitado está indisponível no momento. <br/>Por favor, tente novamente mais tarde.";
+                break;
+            }
+            return View(modelError);
+
+        }
+
     }
 }
