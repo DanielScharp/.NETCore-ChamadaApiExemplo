@@ -26,7 +26,6 @@ namespace ChamadaApi.Api.Controllers
             {
                 var result = await _leiloesApplication.GetAuctionAsync(id);
 
-
                 return Ok(ResultMessage.Sucesso(id, result));
             }
             catch

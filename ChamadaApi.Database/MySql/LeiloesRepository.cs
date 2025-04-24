@@ -171,7 +171,7 @@ namespace ChamadaApi.Database.MySql
 
                 var query = new StringBuilder();
 
-                query.AppendFormat("  ", id);
+                query.AppendFormat(" DELETE FROM `leilao`.`leiloes` WHERE (`codigo` = '{0}'); ", id);
 
                 using MySqlCommand command = new(query.ToString(), connection);
 
